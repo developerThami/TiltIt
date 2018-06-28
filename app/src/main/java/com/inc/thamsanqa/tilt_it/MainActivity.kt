@@ -1,15 +1,13 @@
 package com.inc.thamsanqa.tilt_it
 
-import android.content.Context
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.hardware.SensorManager
+import android.os.CountDownTimer
 import android.util.Log
-import android.view.View
-import com.inc.thamsanqa.tilt_it.R.id.*
 import kotlinx.android.synthetic.main.activity_main.*
 
 
@@ -18,7 +16,9 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private lateinit var mSensorManager: SensorManager
     private lateinit var accelerometer: Sensor
 
-    var mGravity: FloatArray? = null
+    private var mGravity: FloatArray? = null
+
+    var time:Long = 0
 
     var orientation = FloatArray(3)
     private var pitch: Float = 0.0f
@@ -31,7 +31,9 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         mSensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
         accelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
 
-        initListeners()
+        //initListeners()
+
+        //timer.start()
     }
 
     private fun initListeners() {
@@ -55,12 +57,12 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             pitch = (Math.atan2((-x), Math.sqrt(y * y + z * z)) * 57.3).toFloat()
 
             Log.d("Angles", "X:$pitch , Y:$roll")
-
         }
 
     }
 
     public override fun onDestroy() {
+        timer.cancel()
         mSensorManager.unregisterListener(this)
         super.onDestroy()
     }
@@ -78,5 +80,22 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     override fun onPause() {
         mSensorManager.unregisterListener(this)
         super.onPause()
+    }
+
+    var totalMilliSeconds: Long = 1000
+    var intervalMilliSeconds: Long = 1
+
+    private var timer: CountDownTimer = object : CountDownTimer( totalMilliSeconds, intervalMilliSeconds) {
+        override fun onTick(millisUntilFinished: Long) {
+            totalMilliSeconds = millisUntilFinished
+        }
+
+        override fun onFinish() {
+            startGame()
+        }
+    }
+
+    private fun startGame() {
+
     }
 }

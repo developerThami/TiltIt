@@ -9,6 +9,7 @@
         android:id="@+id/iv_left"
         android:layout_width="@dimen/image_width"
         android:layout_height="@dimen/image_height"
+        android:visibility="invisible"
         android:layout_centerVertical="true"
         android:layout_toLeftOf="@id/iv_center"
         android:src="@drawable/ic_arrow_left" />
@@ -17,6 +18,7 @@
         android:id="@+id/iv_right"
         android:layout_width="@dimen/image_width"
         android:layout_height="@dimen/image_height"
+        android:visibility="invisible"
         android:layout_centerVertical="true"
         android:layout_toRightOf="@id/iv_center"
         android:src="@drawable/ic_arrow_right" />
@@ -25,6 +27,7 @@
         android:id="@+id/iv_down"
         android:layout_width="@dimen/image_width"
         android:layout_height="@dimen/image_height"
+        android:visibility="invisible"
         android:layout_below="@id/iv_center"
         android:layout_centerHorizontal="true"
         android:src="@drawable/ic_arrow_down" />
@@ -33,14 +36,18 @@
         android:id="@+id/iv_up"
         android:layout_width="@dimen/image_width"
         android:layout_height="@dimen/image_height"
+        android:visibility="invisible"
         android:layout_above="@id/iv_center"
         android:layout_centerHorizontal="true"
         android:src="@drawable/ic_arrow_up" />
 
-    <ImageView
+    <TextView
         android:id="@+id/iv_center"
-        android:layout_width="@dimen/image_width"
+        android:layout_width="wrap_content"
         android:layout_height="@dimen/image_height"
+        android:textStyle="bold"
+        android:textSize="65sp"
+        android:gravity="center"
         android:layout_centerInParent="true" />
 
 </RelativeLayout>
