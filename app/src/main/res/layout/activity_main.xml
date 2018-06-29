@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
     tools:context=".MainActivity">
 
     <ImageView
@@ -43,7 +44,7 @@
 
     <TextView
         android:id="@+id/iv_center"
-        android:layout_width="wrap_content"
+        android:layout_width="@dimen/image_width"
         android:layout_height="@dimen/image_height"
         android:textStyle="bold"
         android:textSize="65sp"
