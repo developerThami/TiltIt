@@ -1,10 +1,10 @@
 package com.inc.thamsanqa.tilt_it
 
+import android.content.Intent
 import android.hardware.Sensor
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.hardware.SensorManager
-import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
@@ -15,23 +15,19 @@ import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity(), TimerListener {
 
-
     private lateinit var mSensorManager: SensorManager
     private lateinit var accelerometer: Sensor
 
-    private val sSecond:Long = 1000
+    private val sSecond: Long = 1000
 
     private lateinit var actualTiltDirection: Direction
     private lateinit var expectedTiltDirection: Direction
 
     var orientation = FloatArray(3)
-    private var pitch: Float = 0.0f
-    private var roll: Float = 0.0f
+    private lateinit var timer: SimpleTimer
+    private var scoreCount: Int = 0
 
-    var scoreCount: Int = 0
-    var answered:Boolean = false
-
-    lateinit var sensor: AccelerometorSensor
+    private lateinit var sensor: AccelerometorSensor
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,13 +38,24 @@ class MainActivity : AppCompatActivity(), TimerListener {
         mSensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
         accelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
 
-        sensor = AccelerometorSensor(mSensorManager,accelerometer)
+        sensor = AccelerometorSensor(mSensorManager, accelerometer)
 
-//        Log.d("Angles", "X:$pitch , Y:$roll , Expected:$expectedTiltDirection  Actual:$actualTiltDirection")
-//        actualTiltDirection = Direction.NONE
-//        expectedTiltDirection = Direction.NONE
-//        startGame()
+        actualTiltDirection = Direction.NONE
+        expectedTiltDirection = Direction.NONE
 
+        action_new_game.setOnClickListener { restartGame() }
+        action_quit.setOnClickListener { quitGame() }
+        startGame()
+    }
+
+    private fun quitGame() {
+        val intent = Intent(this, StartActivity::class.java)
+        startActivity(intent)
+    }
+
+    private fun restartGame() {
+        val intent = Intent(this, MainActivity::class.java)
+        startActivity(intent)
     }
 
     public override fun onDestroy() {
@@ -62,21 +69,23 @@ class MainActivity : AppCompatActivity(), TimerListener {
     }
 
     public override fun onResume() {
-        sensor = AccelerometorSensor(mSensorManager,accelerometer)
+        sensor = AccelerometorSensor(mSensorManager, accelerometer)
         super.onResume()
     }
 
     override fun onPause() {
+        timer.stopTimer()
         sensor.stopListener()
         super.onPause()
     }
 
     private fun startNextRound() {
-        SimpleTimer(this).startTimer(randomTimeGenerator() * sSecond, sSecond)
+        timer = SimpleTimer(this, randomTimeGenerator() * sSecond, sSecond)
+        timer.startTimer()
     }
 
     private fun startGame() {
-        SimpleTimer(this).startTimer(3 * sSecond, sSecond)
+        SimpleTimer(this, 3 * sSecond, sSecond).startTimer()
     }
 
     override fun onTick(millisLeft: Long) {
@@ -86,15 +95,83 @@ class MainActivity : AppCompatActivity(), TimerListener {
 
     override fun timerDone() {
 
-        requestUserToTilt()
-        startNextRound()
+        val isTiltDirectionCorrect = checkTiltDirection(sensor.actualTiltDirection, expectedTiltDirection)
+        val isTiltAngleSufficient = checkTiltAngle(sensor.pitch, sensor.roll, sensor.actualTiltDirection)
 
-        Toast.makeText(this,"done",Toast.LENGTH_SHORT).show()
+        grantPointIfTiltMeetsRequirements(isTiltDirectionCorrect, isTiltAngleSufficient)
+
+        requestUserToTilt()
+
+        if (scoreCount < 10) {
+            startNextRound()
+        } else {
+            gameOver()
+        }
+    }
+
+    private fun grantPointIfTiltMeetsRequirements(tiltDirectionCorrect: Boolean, tiltAngleSufficient: Boolean) {
+        if (tiltAngleSufficient && tiltDirectionCorrect) {
+            incrementPoints()
+        }
+    }
+
+    private fun incrementPoints() {
+        scoreCount++
+        updateUserScore()
+    }
+
+    private fun gameOver() {
+        timer.stopTimer()
+        sensor.stopListener()
+
+        noTilt()
+        showToast("Congratulations!! You have reached 10 points")
+    }
+
+    private fun updateUserScore() {
+        tv_score.text = "score : $scoreCount"
+    }
+
+    private fun checkTiltAngle(pitch: Float, roll: Float, actualTiltDirection: Direction): Boolean {
+
+        /**
+         * when tilting Right ,  (Check roll fif angle >= 50)
+         * when tilting Left  ,  (Check roll fif angle >= 50)
+         * when tilting Up    ,  (Check pitch if angle >= 50)
+         * when tilting Down  ,  (Check pitch if angle >= 50)
+         **/
+
+        var angle = 0.0f
+        when (actualTiltDirection) {
+            Direction.UP -> {
+                angle = Math.abs(pitch)
+            }
+            Direction.DOWN -> {
+                angle = Math.abs(pitch)
+            }
+            Direction.LEFT -> {
+                angle = Math.abs(roll)
+            }
+            Direction.RIGHT -> {
+                angle = Math.abs(roll)
+            }
+            Direction.NONE -> {
+                angle = 0.0f
+            }
+        }
+
+        return angle >= 50.0
+    }
+
+    private fun checkTiltDirection(actualTiltDirection: Direction, expectedTiltDirection: Direction): Boolean {
+        //Log.d("Angles", "Expected:$expectedTiltDirection  Actual:$actualTiltDirection")
+        return actualTiltDirection == expectedTiltDirection
     }
 
     private fun requestUserToTilt() {
 
         expectedTiltDirection = randomDirectionGenerator()
+        showToast(expectedTiltDirection.toString())
 
         when (expectedTiltDirection) {
             Direction.UP -> tiltUp()
@@ -107,11 +184,16 @@ class MainActivity : AppCompatActivity(), TimerListener {
         }
     }
 
+    private fun showToast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    }
+
     private fun noTilt() {
         iv_down.visibility = View.INVISIBLE
         iv_left.visibility = View.INVISIBLE
         iv_right.visibility = View.INVISIBLE
         iv_up.visibility = View.INVISIBLE
+        iv_center.visibility = View.INVISIBLE
     }
 
     private fun tiltRight() {
@@ -141,7 +223,5 @@ class MainActivity : AppCompatActivity(), TimerListener {
         iv_left.visibility = View.INVISIBLE
         iv_right.visibility = View.INVISIBLE
     }
-
-
 
 }

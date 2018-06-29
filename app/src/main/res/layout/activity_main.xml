@@ -47,8 +47,45 @@
         android:layout_width="@dimen/image_width"
         android:layout_height="@dimen/image_height"
         android:textStyle="bold"
-        android:textSize="65sp"
+        android:textSize="@dimen/center_text_size"
         android:gravity="center"
         android:layout_centerInParent="true" />
+
+    <TextView
+        android:id="@+id/tv_score"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/new_game_margin"
+        android:textStyle="bold"
+        android:textSize="@dimen/score_text_size"
+        android:gravity="center"
+        android:layout_alignParentRight="true"/>
+
+    <Button
+        android:id="@+id/action_new_game"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/new_game_margin"
+        android:layout_marginLeft="@dimen/new_game_margin"
+        style="@style/Base.Widget.AppCompat.Button.Borderless"
+        android:textColor="@android:color/white"
+        android:textStyle="bold"
+        android:text="@string/new_game"
+        android:gravity="center"
+        android:layout_alignParentLeft="true"/>
+
+
+    <Button
+        android:id="@+id/action_quit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/new_game_margin"
+        style="@style/Base.Widget.AppCompat.Button.Borderless"
+        android:textColor="@android:color/white"
+        android:textStyle="bold"
+        android:text="@string/quit"
+        android:gravity="center"
+        android:layout_below="@id/action_new_game"
+        android:layout_alignParentLeft="true"/>
 
 </RelativeLayout>

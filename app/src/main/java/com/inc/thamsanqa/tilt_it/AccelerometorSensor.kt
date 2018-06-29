@@ -8,9 +8,9 @@ import android.util.Log
 
 class AccelerometorSensor(private val mSensorManager: SensorManager, accelerometer: Sensor) : SensorEventListener {
 
-    private lateinit var actualTiltDirection: Direction
-    private var pitch: Float = 0.0f
-    private var roll: Float = 0.0f
+     lateinit var actualTiltDirection: Direction
+     var pitch: Float = 0.0f
+     var roll: Float = 0.0f
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
 

@@ -2,4 +2,7 @@
 <resources>
     <dimen name="image_height">100dp</dimen>
     <dimen name="image_width">100dp</dimen>
+    <dimen name="score_text_size">30sp</dimen>
+    <dimen name="new_game_margin">10dp</dimen>
+    <dimen name="center_text_size">65sp</dimen>
 </resources>
